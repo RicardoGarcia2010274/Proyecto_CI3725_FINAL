@@ -7,7 +7,7 @@ import java.nio.file.Path;
 public class Main {
 
   public static void main(String[] args) throws Exception {
-
+ 
     // Ruta del archivo que voy a leer, debe estar en la carpeta src
 	
     String ruta_archivo = args[1];
