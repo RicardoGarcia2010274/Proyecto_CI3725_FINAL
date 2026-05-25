@@ -9,12 +9,17 @@ dependiendo de si hay errores o no.
 */
 public class Main {
 
-  public static void main(String[] args) throws Exception {
- 
+ public static void main(String[] args) {
+	
+	if (args.length == 0) {
+		System.out.println("Especifique un archivo.bot");
+		return;
+	}
+
     // Nombre del archivo de extensión .bot a leer, debe estar en la carpeta "Etapa 1" 
 	// y ser dado como argumento en la linea de comandos
 	
-    String ruta_archivo = args[1];
+    String ruta_archivo = args[0];
 		
 		//Estructura try catch para que el programa maneje correctamente los fallos al leer el archivo. 
     try {
