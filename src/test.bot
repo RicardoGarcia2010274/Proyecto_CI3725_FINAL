@@ -1,0 +1,13 @@
+bot execute 'a':
+    int 35
+        activation: on
+    store contador.
+    store '\n'
+    end
+end
+$- Asignar al 35
+el valor contador -$
+        contador end.
+activate create
+            x /= 50
+end
