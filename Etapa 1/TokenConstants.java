@@ -1,4 +1,6 @@
-//Esta parte contiene todos los tokens que usa nuestro Lexer
+/* Clase TokenConstants que contiene todos los tokens asociados al lenguaje BOT
+a ser interpretados por el Lexer, e incluso un token TkError para manejo de errores
+*/
 
 public enum TokenConstants {
     TkIdent,

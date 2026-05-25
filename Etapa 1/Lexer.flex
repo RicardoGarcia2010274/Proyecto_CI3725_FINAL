@@ -8,6 +8,7 @@ digit = [0-9]
 letter = [a-zA-Z]
 whitespace = [ \t\r\n]
 coments = "$"~"$"
+comentsline = "$$"~[\n]
 saltolinea = "\\n"
 tabulador = "\\t"
 comillasimple = "\\\'"
@@ -65,7 +66,7 @@ desigual = "/="
 %type Token
 
 %eofval{
-    return new Token(TokenConstants.TkFinal, yytext(),  yyline, yycolumn);
+    return new Token(TokenConstants.TkFinal, yytext(), yyline + 1, yycolumn + 1);
 %eofval}
 %%
 
@@ -120,10 +121,11 @@ desigual = "/="
 {activate} {return new Token(TokenConstants.TkActivate, yytext(), yyline + 1, yycolumn + 1);}
 {execute} {return new Token(TokenConstants.TkExecute, yytext(), yyline + 1, yycolumn + 1);}
 {letter}({letter}|{digit}|{underscore})* { return new Token(TokenConstants.TkIdent, yytext(),  yyline + 1, yycolumn + 1);}
+{comilla}{saltolinea}{comilla} {return new Token(TokenConstants.TkChar, yytext(), yyline + 1, yycolumn + 1);}
+{comilla}{tabulador}{comilla} {return new Token(TokenConstants.TkChar, yytext(), yyline + 1, yycolumn + 1);}
+{comilla}{comillasimple}{comilla} {return new Token(TokenConstants.TkChar, yytext(), yyline + 1, yycolumn + 1);}
 
 {whitespace} {/* ignorar */}
 {coments} {/* ignorar */}
-{comilla}{saltolinea}{comilla} {/* ignorar */}
-{comilla}{tabulador}{comilla} {/* ignorar */}
-{comilla}{comillasimple}{comilla} {/* ignorar */}
+{comentsline} {/* ignorar */}
 [^] { return new Token(TokenConstants.TkError, yytext(), yyline + 1, yycolumn + 1); }

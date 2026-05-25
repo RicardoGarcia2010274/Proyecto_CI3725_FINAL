@@ -1,11 +1,10 @@
-//esta clase contiene todo el funcionamiento y logica de los tokens 
+// Clase que contiene todos los atributos y lógica de los tokens 
 
 public class Token {
 
-    /*
-    Estos cuatro atributos representan: 
+    /* Estos cuatro atributos representan: 
         tipo: el tipo del token, de los definidos en TokenConstants
-        lexema: es el valor del token, esto es, lo que lee el lexer
+        lexema: es el valor del token, esto es, la cadena leída por el Lexer
         fila: es la fila donde se encuentra el token
         columna: es la columna donde se encuentra el token 
     */
@@ -20,17 +19,17 @@ public class Token {
         this.columna = columna;
     } 
 
-    /*
-    Esta parte del codigo describe los metodos de la clase Token: 
-        *El metodo toString lo que hace es devolver un String con el Token correspondiente el elemento que leyo el lexer.
-        *Los metodos tipo, lexema y fila, retornar estos valores de la clase respectivamente. En el Main.java se necesita esta 
-         informacion, pero como los atributos de la clase son privados, no podemos acceder a ellos desde el Main. Entonces se 
-         crearon estos metodos. 
+    /* Métodos de la clase Token: 
+        *El método toString devuelve un String con el Token correspondiente al elemento que 
+        leyó el lexer según la especificación del proyecto.
+        *Los métodos tipo, lexema y fila, retornan estos valores de la clase respectivamente. 
+        En el Main.java se necesita esta informacion, pero como los atributos de la clase 
+        son privados, no podemos acceder a ellos desde el Main. Entonces se crearon estos métodos. 
     */
     @Override
     public String toString(){
         String ubicacion = " "+fila+" "+ columna + "";
-        //esta serie de ifs lo que hacen es controlar que tipo de token recibo, definiendo su comportamiento
+        // Esta serie de ifs controlan que tipo de token es recibido, definiendo su comportamiento
         if (this.tipo == TokenConstants.TkNum || this.tipo == TokenConstants.TkCaracter){
             return ""+tipo + "(" + lexema + ")" + ubicacion;
         } else if (this.tipo == TokenConstants.TkIdent){

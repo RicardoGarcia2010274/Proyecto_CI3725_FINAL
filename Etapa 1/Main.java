@@ -1,35 +1,40 @@
-//Estas son las libreriaas que utilizamos
+//Librerías que se utilizaron
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-//este es el archivo principal
+/* Archivo principal, encargado de leer el archivo de extensión .bot, 
+interpretar el contenido del mismo e imprimir la salida de la forma correcta
+dependiendo de si hay errores o no.
+*/
 public class Main {
 
   public static void main(String[] args) throws Exception {
  
-    // Ruta del archivo que voy a leer, debe estar en la carpeta src
+    // Nombre del archivo de extensión .bot a leer, debe estar en la carpeta "Etapa 1" 
+	// y ser dado como argumento en la linea de comandos
 	
     String ruta_archivo = args[1];
 		
-		//estructura try catch, que sirve para que el programa no explote si hay un fallo al leer el archivo 
+		//Estructura try catch para que el programa maneje correctamente los fallos al leer el archivo. 
     try {
       
-			// guardamos el contenido del archivo en una variable llamada contenido_archivo 
       String contenido_archivo = Files.readString(Path.of(ruta_archivo));
 
-			//esta parte del codigo es la encargada de interpretar el contenido del archivo
+			// Enlace con la herramienta JFlex a través de la clase Lexer.
+			// Es la parte que interpreta el archivo
       Reader strRdr = new StringReader(contenido_archivo);
       Lexer lexer = new Lexer(strRdr);
       
 			//generamos un objeto de tipo Token
       Token tk;
 
-			//salida guarda un string con los tokens que interpreto el lexer sin errores 
-      String salida = ""; //salida sin errores 
-			String errores =""; //salida con errores
+			// salida es una variable que guarda un string con todos los tokens que interpretó el
+			// lexer sin errores y en orden
+      String salida = "";
+			String errores =""; // Variable que guarda los errores hallados
 			
-			//bucle principal, donde leemos todo el contenido del archivo test.txt
+			// Bucle principal, donde se lee todo el contenido del archivo de entrada
       while ((tk = lexer.yylex()) != null){
 				
 				if (tk.tipo() == TokenConstants.TkFinal){

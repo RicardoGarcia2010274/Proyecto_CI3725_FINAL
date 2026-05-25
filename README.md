@@ -1,18 +1,19 @@
-## Getting Started
+# Proyecto: Intérprete de BOT
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+**Universidad Simón Bolívar**  
+**Departamento de Computación y Tecnología de la Información**  
+**Asignatura:** Traductores e interpretadores (CI-3721)  
+**Trimestre:** Abril-Julio 2026  
 
-## Folder Structure
+## Estudiantes
 
-The workspace contains two folders by default, where:
+### Nombre Completo y Carnet
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+Daniela Gragirena 19-10543
+Ricardo García 20-10274
+Daniel Quijada 20-10518
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+## Descripción del Proyecto
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+Desarrollo de un intérprete para el lenguaje BOT, tal que consta de 4 etapas: (I) Análisis lexicográfico; (II) Análisis sintáctico y construcción
+del árbol sintáctico abstracto; (III) Análisis de contexto; e (IV) Intérprete final del lenguaje.
