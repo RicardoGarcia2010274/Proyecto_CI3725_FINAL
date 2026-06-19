@@ -2,11 +2,11 @@ import java.util.ArrayList;
 
 public class Programa extends AST {
     private ArrayList<Declaracion> declaraciones;
-    private Instruccion cuerpoControlador;
+    private Instruccion instruccion;
 
-    public Programa(ArrayList<Declaracion> declaraciones, Instruccion cuerpoControlador) {
+    public Programa(ArrayList<Declaracion> declaraciones, Instruccion instruccion) {
         this.declaraciones = declaraciones;
-        this.cuerpoControlador = cuerpoControlador;
+        this.instruccion = instruccion;
     }
 
     @Override
@@ -16,16 +16,16 @@ public class Programa extends AST {
 
         if (declaraciones != null && !declaraciones.isEmpty()) {
             imprimirIndentacion(nivel + 1);
-            System.out.println("SECCION DECLARACIONES:");
+            System.out.println("DECLARACIONES:");
             for (Declaracion decl : declaraciones) {
                 decl.imprimir(nivel + 2);
             }
         }
 
-        if (cuerpoControlador != null) {
+        if (instruccion != null) {
             imprimirIndentacion(nivel + 1);
-            System.out.println("CUERPO PRINCIPAL (EXECUTE):");
-            cuerpoControlador.imprimir(nivel + 2);
+            System.out.println("EXECUTE:");
+            instruccion.imprimir(nivel + 2);
         }
     }
 }
