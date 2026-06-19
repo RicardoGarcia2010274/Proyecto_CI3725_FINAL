@@ -1,0 +1,117 @@
+import java.util.ArrayList;
+
+class Parser;
+
+terminal TkCreate, TkExecute, TkEnd, TkInt, TkBot, TkWhile, TkIf, TkElse;
+terminal TkSuma, TkResta, TkMult, TkDiv, TkMod, TkParAbre, TkParCierra;
+terminal TkPunto, TkComa, TkDosPuntos, TkIgual, TkMenor, TkMayor, TkNegacion;
+terminal TkDisyuncion, TkConjuncion, TkAs, TkUp, TkMe, TkOn, TkChar, TkRead;
+terminal TkDesigual, TkMayorIgual, TkMenorIgual, TkDrop, TkDown, TkLeft, TkSend;
+terminal TkCaracter, TkBool, TkRight, TkStore, TkCollect, TkDefault;
+terminal TkAdvance, TkActivate, TkDeactivate, TkActivation, TkDeactivation;
+terminal TkError;
+terminal MENOS_UNARIO;
+
+terminal String  TkIdent;
+terminal Integer TkNum;
+terminal Boolean TkTrue, TkFalse;
+
+non terminal Expresion expr;
+non terminal Instruccion instcontr;
+non terminal Instruccion instrobot;
+non terminal Instruccion secuenciacontr;
+non terminal Instruccion secuenciarobot;
+non terminal ArrayList<Declaracion> lista_declr;
+non terminal ArrayList<Identificador> lista_ident;
+non terminal ArrayList<Comportamiento> lista_comp;
+non terminal Identificador ident;
+non terminal Comportamiento comportamiento;
+non terminal Condicion condicion;
+non terminal AST inicial;
+
+precedence left TkDisyuncion;
+precedence left TkConjuncion;
+precedence nonassoc TkIgual, TkDesigual, TkMayor, TkMenor, TkMayorIgual, TkMenorIgual;
+precedence left TkSuma, TkResta;
+precedence left TkMult, TkDiv, TkMod;
+precedence right TkNegacion;
+precedence right MENOS_UNARIO;
+
+start with inicial;
+
+inicial ::= TkCreate lista_declr:d TkExecute secuenciacontr:s TkEnd {: RESULT = new Programa(d, s); :}
+    | TkExecute secuenciacontr:s TkEnd {: RESULT = new Programa(null, s); :};
+
+lista_declr ::= lista_declr:ld TkBool TkBot ident:id lista_comp:c TkEnd {: ld.add(new Declaracion("bool", id, c)); RESULT = ld; :}
+    | lista_declr:ld TkInt TkBot ident:id lista_comp:c TkEnd {: ld.add(new Declaracion("int", id, c)); RESULT = ld; :}
+    | lista_declr:ld TkChar TkBot ident:id lista_comp:c TkEnd {: ld.add(new Declaracion("char", id, c)); RESULT = ld; :}
+    | {: RESULT = new ArrayList<Declaracion>(); :};
+
+ident ::= TkIdent:id {: RESULT = new Identificador(id); :};
+
+lista_ident ::= lista_ident:li TkComa ident:i {: li.add(i); RESULT = li; :}
+    | ident:i {: ArrayList<Identificador> lista = new ArrayList<Identificador>(); lista.add(i); RESULT = lista; :}
+    | {: RESULT = new ArrayList<Identificador>(); :};
+
+lista_comp ::= lista_comp:lc comportamiento:c {: lc.add(c); RESULT = lc; :}
+    | {: RESULT = new ArrayList<Comportamiento>(); :};
+
+comportamiento ::= TkOn condicion:c TkDosPuntos secuenciarobot:s TkEnd {: RESULT = new Comportamiento(c, s); :};
+
+condicion ::= expr:e {: RESULT = new CondExpresion(e); :}
+    | TkActivation {: RESULT = new CondActivation(); :}
+    | TkDeactivation {: RESULT = new CondDeactivation(); :}
+    | TkDefault {: RESULT = new CondDefault(); :};
+
+secuenciacontr ::= secuenciacontr:s instcontr:i {: RESULT = new Secuenciacion(s, i); :}
+    | instcontr:i {: RESULT = i; :};
+
+instcontr ::= TkActivate lista_ident:id TkPunto {: RESULT = new Activacion(id); :}
+    | TkAdvance lista_ident:id TkPunto  {: RESULT = new Avance(id); :}
+    | TkDeactivate lista_ident:id TkPunto {: RESULT = new Desactivacion(id); :}
+    | TkIf expr:e TkDosPuntos secuenciacontr:s TkEnd {: RESULT = new Condicional(e, s, null); :}
+    | TkIf expr:e TkDosPuntos secuenciacontr:s1 TkElse TkDosPuntos secuenciacontr:s2 TkEnd {: RESULT = new Condicional(e, s1, s2); :}
+    | TkWhile expr:e TkDosPuntos secuenciacontr:s TkEnd {: RESULT = new IteracionIndet(e, s); :}
+    | TkCreate lista_declr:d TkExecute secuenciacontr:s TkEnd {: RESULT = new IncorpAlcance(d, s); :}
+    | TkExecute secuenciacontr:s TkEnd {: RESULT = new IncorpAlcance(null, s); :};
+
+secuenciarobot ::= secuenciarobot:s instrobot:i {: RESULT = new Secuenciacion(s, i); :}
+    | instrobot:i {: RESULT = i; :};
+
+instrobot ::= TkStore expr:e TkPunto {: RESULT = new Almacenamiento(e); :}
+    | TkCollect TkAs TkIdent:var TkPunto {: RESULT = new Coleccion(new Identificador(var)); :}
+    | TkCollect TkPunto {: RESULT = new Coleccion(null); :}
+    | TkDrop expr:e TkPunto {: RESULT = new Soltado(e); :}
+    | TkLeft expr:e TkPunto {: RESULT = new Movimiento("left", e); :}
+    | TkRight expr:e TkPunto {: RESULT = new Movimiento("right", e); :}
+    | TkUp expr:e TkPunto {: RESULT = new Movimiento("up", e); :}
+    | TkDown TkPunto {: RESULT = new Movimiento("down", null); :}
+    | TkLeft TkPunto {: RESULT = new Movimiento("left", null); :}
+    | TkRight TkPunto {: RESULT = new Movimiento("right", null); :}
+    | TkUp TkPunto {: RESULT = new Movimiento("up", null); :}
+    | TkDown expr:e TkPunto {: RESULT = new Movimiento("down", e); :}
+    | TkRead TkPunto {: RESULT = new Entrada(null); :}
+    | TkRead TkAs TkIdent:id TkPunto {: RESULT = new Entrada(new Identificador(id)); :}
+    | TkSend expr:e TkPunto {: RESULT = new Salida(e); :};
+
+expr ::= expr:e1 TkSuma expr:e2 {: RESULT = new ExpBinArit("+", e1, e2); :}
+    | expr:e1 TkResta expr:e2 {: RESULT = new ExpBinArit("-", e1, e2); :}
+    | expr:e1 TkMult expr:e2 {: RESULT = new ExpBinArit("*", e1, e2); :}
+    | expr:e1 TkDiv expr:e2 {: RESULT = new ExpBinArit("/", e1, e2); :}
+    | expr:e1 TkMod expr:e2 {: RESULT = new ExpBinArit("%", e1, e2); :}
+    | TkParAbre expr:e TkParCierra {: RESULT = e; :}
+    | TkResta expr:e {: RESULT = new ExpUnaria("-", e); :} %prec MENOS_UNARIO
+    | TkNum:n {: RESULT = new LiteralEntero(n); :}
+    | TkIdent:id {: RESULT = new Identificador(id); :}
+    | expr:e1 TkConjuncion expr:e2 {: RESULT = new ExpBinBool("/\\", e1, e2); :}
+    | expr:e1 TkDisyuncion expr:e2 {: RESULT = new ExpBinBool("\\/", e1, e2); :}
+    | TkNegacion expr:e1 {: RESULT = new ExpUnaria("~", e1); :}
+    | TkTrue {: RESULT = new LiteralBool(true); :}
+    | TkFalse {: RESULT = new LiteralBool(false); :}
+    | expr:e1 TkDesigual expr:e2 {: RESULT = new ExpBinRelacional("!=", e1, e2); :}
+    | expr:e1 TkIgual expr:e2 {: RESULT = new ExpBinRelacional("==", e1, e2); :}
+    | expr:e1 TkMayor expr:e2 {: RESULT = new ExpBinRelacional(">", e1, e2); :}
+    | expr:e1 TkMenor expr:e2 {: RESULT = new ExpBinRelacional("<", e1, e2); :}
+    | expr:e1 TkMayorIgual expr:e2 {: RESULT = new ExpBinRelacional(">=", e1, e2); :}
+    | expr:e1 TkMenorIgual expr:e2 {: RESULT = new ExpBinRelacional("<=", e1, e2); :}
+    | TkCaracter:c {: RESULT = new LiteralCaracter(c); :};
