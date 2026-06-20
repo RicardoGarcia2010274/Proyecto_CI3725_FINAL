@@ -4,7 +4,7 @@ public abstract class AST {
 
     protected void imprimirIndentacion(int nivel) {
         for (int i = 0; i < nivel; i++) {
-            System.out.print("\t");
+            System.out.print("  ");
         }
     }
 }

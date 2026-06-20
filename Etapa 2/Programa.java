@@ -11,21 +11,8 @@ public class Programa extends AST {
 
     @Override
     public void imprimir(int nivel) {
-        imprimirIndentacion(nivel);
-        System.out.println("PROGRAMA BOT");
-
-        if (declaraciones != null && !declaraciones.isEmpty()) {
-            imprimirIndentacion(nivel + 1);
-            System.out.println("DECLARACIONES:");
-            for (Declaracion decl : declaraciones) {
-                decl.imprimir(nivel + 2);
-            }
-        }
-
-        if (instruccion != null) {
-            imprimirIndentacion(nivel + 1);
-            System.out.println("EXECUTE:");
-            instruccion.imprimir(nivel + 2);
-        }
+    if (instruccion != null) {
+        instruccion.imprimir(nivel);
     }
+}
 }
