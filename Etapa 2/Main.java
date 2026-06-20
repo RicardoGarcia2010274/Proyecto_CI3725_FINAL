@@ -1,3 +1,4 @@
+import java_cup.runtime.Symbol;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,20 +15,35 @@ public class Main {
         String archivo = args[0];
             
         try {
-            String contenido_archivo = Files.readString(Path.of(archivo));
-
-            Reader strRdr = new StringReader(contenido_archivo);
-            LexerCup lexer = new LexerCup(strRdr);
-            Parser parser = new Parser(lexer);
-          
-            AST nodoAST = (AST) parser.parse().value;
+            FileReader fileReader = new FileReader(args[0]);
+            LexerCup lexer = new LexerCup(fileReader);            
+            Parser parserInstance = new Parser(lexer);
             
-            if (nodoAST != null) {
-                nodoAST.imprimir(0);
+            boolean tieneErroresLexicos = false;
+            Symbol token;
+            
+            // Verificamos el archivo una vez para verificar exclusivamente léxico
+            while ((token = lexer.next_token()).sym != ParserSym.EOF) {
             }
-
+            
+            if (lexer.hashErrors()) {
+                // Si hubo errores abortamos inmediatamente sin invocar al Parser
+                System.exit(1);
+            }
+            
+            // Si no hubo errores léxicos, reiniciamos el lector para el Analizador Sintáctico
+            fileReader = new FileReader(args[0]);
+            lexer = new LexerCup(fileReader);
+            parserInstance = new Parser(lexer);
+            
+            // Ejecutamos el parser e imprimimimos el AST
+            AST arbol = (AST) parserInstance.parse().value;
+            if (arbol != null) {
+                arbol.imprimir(0);
+            }
+            
         } catch (Exception e) {
-            System.err.println("Ocurrio un error durante la compilacion: " + e.getMessage());
+            System.exit(1);
         }
     }
 }

@@ -127,7 +127,7 @@ class LiteralEntero extends Expresion {
 
 class LiteralCaracter extends Expresion {
     private String caracter;
-    public LiteralCaracter(Object caracter) {
+    public LiteralCaracter(String caracter) {
         this.caracter = (String) caracter;
     }
 

@@ -1,19 +1,26 @@
 create
-    int bot bar
+    int bot contador, acumulador
         on activation:
-            store 3.
+            store 10.
+        end
+        on default:
+            store contador + 1.
         end
     end
-    int bot contador
+    int bot sumador
         on default:
-            store 35.
+            store acumulador + 2.
         end
     end
 execute
-    activate contador.
-    $- Asignar al contador
-    el valor 35, si bar > 2 -$
-    if bar > 2:
-        advance contador.
-    end
+    activate contador, acumulador, sumador.
+    $- El contador empieza en 10 y suma 1 en cada avance -$
+    advance contador.
+    $- El acumulador empieza en 0 y suma el valor del contador -$
+    advance acumulador.
+    $- El sumador empieza en 0 y suma 2 en cada avance -$
+    advance sumador.
+    $- Se imprimen los valores -$
+    send acumulador.
+    send sumador.
 end

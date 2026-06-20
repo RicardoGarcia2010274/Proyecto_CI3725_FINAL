@@ -127,9 +127,9 @@ class Secuenciacion extends Instruccion {
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
         System.out.println("- SECUENCIACION: ");
-        i1.imprimir(nivel + 1);
-        i2.imprimir(nivel + 1);
-    }
+        if (i1 != null) i1.imprimir(nivel + 1);
+        if (i2 != null) i2.imprimir(nivel + 1);
+}
 }
 
 class Entrada extends Instruccion {
@@ -143,7 +143,9 @@ class Entrada extends Instruccion {
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
         System.out.println("- ENTRADA:");
-        id.imprimir(nivel + 1);
+        if (id != null) {
+            id.imprimir(nivel + 1);
+        }
     }
 }
 
@@ -157,7 +159,7 @@ class Salida extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("- SALIDA:");
+        System.out.println("- SALIDA");
         
         if (e != null) {
             e.imprimir(nivel + 1);
@@ -178,8 +180,10 @@ class Movimiento extends Instruccion {
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
         System.out.println("- MOVIMIENTO:" + direccion);
-        e.imprimir(nivel + 1);
-    }
+        if (e != null) {
+            e.imprimir(nivel + 1);
+        }
+}
 }
 
 class Soltado extends Instruccion {
@@ -208,7 +212,9 @@ class Coleccion extends Instruccion {
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
         System.out.println("- COLECCION:");
-        id.imprimir(nivel + 1);
+        if (id != null) {
+            id.imprimir(nivel + 1);
+        }
     }
 }
 

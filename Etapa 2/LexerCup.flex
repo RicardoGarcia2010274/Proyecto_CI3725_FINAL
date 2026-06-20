@@ -19,9 +19,16 @@ comilla ="'"
 underscore = "_"
 
 %{
+    private boolean errorLexico = false;
+
+    public boolean hashErrors() {
+        return errorLexico;
+    }
+
     private Symbol symbol(int type) {
         return new Symbol(type, yyline + 1, yycolumn + 1);
     }
+
     private Symbol symbol(int type, Object value) {
         return new Symbol(type, yyline + 1, yycolumn + 1, value);
     }  
@@ -82,16 +89,19 @@ underscore = "_"
 "/" { return symbol(ParserSym.TkDiv); }
 "*" { return symbol(ParserSym.TkMult); }
 
-{digit}+ { return symbol(ParserSym.TkNum, Integer.valueOf(yytext())); }
-{letter}({letter}|{digit}|{underscore})* { return symbol(ParserSym.TkIdent, yytext()); }
-
 {comilla}{letter}{comilla} { return symbol(ParserSym.TkCaracter, yytext()); }
-{comilla}" "{comilla} { return symbol(ParserSym.TkCaracter, yytext()); }
 {comilla}{saltolinea}{comilla} { return symbol(ParserSym.TkCaracter, yytext()); }
 {comilla}{tabulador}{comilla} { return symbol(ParserSym.TkCaracter, yytext()); }
 {comilla}{comillasimple}{comilla} { return symbol(ParserSym.TkCaracter, yytext()); }
+"'" [^'\r\n] "'" { return symbol(ParserSym.TkCaracter, yytext()); }
+
+{digit}+ { return symbol(ParserSym.TkNum, Integer.valueOf(yytext())); }
+{letter}({letter}|{digit}|{underscore})* { return symbol(ParserSym.TkIdent, yytext()); }
 
 {whitespace} {/* ignorar */}
 {coments} {/* ignorar */}
 {comentsline} {/* ignorar */}
-[^] { return symbol(ParserSym.TkError, yytext()); }
+
+[^] { errorLexico = true;
+    System.err.println("Error: Caracter inesperado \"" + yytext() + "\" en la fila " + (yyline + 1) + ", columna " + (yycolumn + 1));
+}
