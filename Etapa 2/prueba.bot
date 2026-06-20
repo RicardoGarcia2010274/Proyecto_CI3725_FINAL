@@ -1,26 +1,30 @@
 create
-    int bot contador, acumulador
+    int bot contador
         on activation:
-            store 10.
-        end
-        on default:
-            store contador + 1.
+            store 0.
         end
     end
-    int bot sumador
+    bool bot bandera
         on default:
-            store acumulador + 2.
+            store contador > 5.
         end
     end
 execute
-    activate contador, acumulador, sumador.
-    $- El contador empieza en 10 y suma 1 en cada avance -$
+    activate contador, bandera.
+    $- Se crea un ámbito local con un nuevo robot "temp" -$
+    create
+        int bot temp
+            on activation:
+                store 100.
+            end
+        end
+    execute
+        activate temp.
+        while temp > 0:
+            advance temp.
+        end
+    end
+    $- Aquí "temp" ya no es visible, pero contador y bandera sí -$
     advance contador.
-    $- El acumulador empieza en 0 y suma el valor del contador -$
-    advance acumulador.
-    $- El sumador empieza en 0 y suma 2 en cada avance -$
-    advance sumador.
-    $- Se imprimen los valores -$
-    send acumulador.
-    send sumador.
+    advance bandera.
 end

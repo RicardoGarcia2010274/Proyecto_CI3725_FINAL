@@ -1,3 +1,4 @@
+//Implementación de clase para la estructura de un programa en lenguaje BOT
 import java.util.ArrayList;
 
 public class Programa extends AST {

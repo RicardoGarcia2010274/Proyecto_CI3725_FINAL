@@ -1,3 +1,4 @@
+// Implementación de clase para las expresiones válidas en el lenguaje BOT
 public abstract class Expresion extends AST {
 }
 
@@ -15,14 +16,14 @@ class ExpBinArit extends Expresion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("EXP_ARITMETICA: ");
+        System.out.println("EXP_ARITMETICA");
         imprimirIndentacion(nivel + 1);
         System.out.println("- operacion: " + op);
         imprimirIndentacion(nivel + 1);
-        System.out.println("- expresion izquierda: ");
+        System.out.println("- operador izquierdo: ");
         if (izq != null) izq.imprimir(nivel + 2);
         imprimirIndentacion(nivel + 1);
-        System.out.println("- expresion derecha: ");
+        System.out.println("- operador derecho: ");
         if (der != null) der.imprimir(nivel + 2);
     }
 }
@@ -66,15 +67,25 @@ class ExpBinRelacional extends Expresion {
 
     @Override
     public void imprimir(int nivel) {
-        imprimirIndentacion(nivel);
-        System.out.println("EXP_RELACIONAL: ");
+        imprimir(nivel, true);
+    }
+
+    @Override
+    public void imprimir(int nivel, boolean indentarPrimeraLinea) {
+        if (indentarPrimeraLinea) {
+            imprimirIndentacion(nivel);
+        }
+        System.out.println("BIN_RELACIONAL");
+        
         imprimirIndentacion(nivel + 1);
         System.out.println("- operacion: " + op);
+        
         imprimirIndentacion(nivel + 1);
-        System.out.println("- expresion izquierda: ");
+        System.out.println("- operador izquierdo:");
         if (izq != null) izq.imprimir(nivel + 2);
+        
         imprimirIndentacion(nivel + 1);
-        System.out.println("- expresion derecha: ");
+        System.out.println("- operador derecho:");
         if (der != null) der.imprimir(nivel + 2);
     }
 }
@@ -92,8 +103,10 @@ class ExpUnaria extends Expresion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("EXP_UNARIA: " + signo);
-        if (e != null) e.imprimir(nivel + 1);
+        System.out.println("EXP_UNARIA"+"("+ signo + ")");
+        if (e != null) {
+            e.imprimir(nivel + 1);
+        }
     }
 }
 

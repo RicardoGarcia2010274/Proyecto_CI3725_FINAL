@@ -1,3 +1,4 @@
+// Implementación de clase para las condiciones en el lenguaje BOT
 public abstract class Condicion extends AST {
     public abstract void imprimir(int nivel);
 }

@@ -3,6 +3,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+// Codigo que ejecuta el programa principal, se encarga de leer el archivo de entrada e
+// instanciar tanto al lexer como al parser y ejecutar el análisis.
 public class Main {
 
     public static void main(String[] args) {

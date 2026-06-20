@@ -20,6 +20,7 @@ parser code {:
     }
 :};
 
+// Creación de los terminales
 terminal TkCreate, TkExecute, TkEnd, TkInt, TkBot, TkWhile, TkIf, TkElse;
 terminal TkSuma, TkResta, TkMult, TkDiv, TkMod, TkParAbre, TkParCierra;
 terminal TkPunto, TkComa, TkDosPuntos, TkIgual, TkMenor, TkMayor, TkNegacion;
@@ -29,10 +30,12 @@ terminal TkBool, TkRight, TkStore, TkCollect, TkDefault;
 terminal TkAdvance, TkActivate, TkDeactivate, TkActivation, TkDeactivation;
 terminal MENOS_UNARIO;
 
+//Terminales con un valor específico asociado
 terminal String  TkIdent, TkCaracter;
 terminal Integer TkNum;
 terminal Boolean TkTrue, TkFalse;
 
+// Creación de los no terminales
 non terminal Expresion expr;
 non terminal Instruccion instcontr;
 non terminal Instruccion instrobot;
@@ -47,6 +50,7 @@ non terminal Comportamiento comportamiento;
 non terminal Condicion condicion;
 non terminal AST inicial;
 
+// Definimos la precedencia de operadores
 precedence left TkDisyuncion;
 precedence left TkConjuncion;
 precedence nonassoc TkIgual, TkDesigual, TkMayor, TkMenor, TkMayorIgual, TkMenorIgual;
@@ -73,9 +77,9 @@ lista_declr ::= declaracion:decl lista_declr:rest
     :}
     | {: RESULT = new ArrayList<Declaracion>(); :};
 
-declaracion ::= TkBool TkBot ident:id lista_comp:c TkEnd {: RESULT = new Declaracion("bool", id, c); :}
-    | TkInt TkBot ident:id lista_comp:c TkEnd {: RESULT = new Declaracion("int", id, c); :}
-    | TkChar TkBot ident:id lista_comp:c TkEnd {: RESULT = new Declaracion("char", id, c); :};
+declaracion ::= TkBool TkBot lista_ident:id lista_comp:c TkEnd {: RESULT = new Declaracion("bool", id, c); :}
+    | TkInt TkBot lista_ident:id lista_comp:c TkEnd {: RESULT = new Declaracion("int", id, c); :}
+    | TkChar TkBot lista_ident:id lista_comp:c TkEnd {: RESULT = new Declaracion("char", id, c); :};
 
 ident ::= TkIdent:id {: RESULT = new Identificador(id); :};
 

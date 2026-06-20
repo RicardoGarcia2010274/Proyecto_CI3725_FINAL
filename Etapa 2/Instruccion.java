@@ -1,16 +1,18 @@
 import java.util.ArrayList;
 
+// Implementación de clase para las instrucciones válidas en el lenguaje BOT
+// Incluye tanto las instrucciones de controlador como las de robot
 public abstract class Instruccion extends AST {
 }
 
 class Declaracion extends Instruccion {
     private String tipo;
-    private Identificador id;
+    private ArrayList<Identificador> identificadores;
     private ArrayList<Comportamiento> comportamientos;
 
-    public Declaracion(String tipo, Identificador id, ArrayList<Comportamiento> comportamientos) {
+    public Declaracion(String tipo, ArrayList<Identificador> identificadores, ArrayList<Comportamiento> comportamientos) {
         this.tipo = tipo;
-        this.id = id;
+        this.identificadores = identificadores;
         this.comportamientos = comportamientos;
     }
 
@@ -18,8 +20,12 @@ class Declaracion extends Instruccion {
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
         System.out.println("- DECLARACION " + tipo + ":");
-        if (id != null) {
-            id.imprimir(nivel + 1);
+        if (identificadores != null) {
+            for (Identificador id : identificadores) {
+                if (id != null) {
+                    id.imprimir(nivel + 1);
+                } 
+            }
         }
         if (comportamientos != null) {
             for (Comportamiento comp : comportamientos) {
@@ -41,7 +47,7 @@ class IncorpAlcance extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("- INCORPORACION DE ALCANCE:");
+        System.out.println("- INCORPORACION DE ALCANCE");
         if (d != null) {
             for (Declaracion dec : d) dec.imprimir(nivel + 1);
         }
@@ -61,7 +67,7 @@ class Activacion extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("ACTIVACION:");
+        System.out.println("ACTIVACION");
         if (identificadores != null) {
             for (Identificador id : identificadores) {
                 if (id != null) {
@@ -82,7 +88,7 @@ class Desactivacion extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("DESACTIVACION:");
+        System.out.println("DESACTIVACION");
         if (identificadores != null) {
             for (Identificador id : identificadores) {
                 if (id != null) {
@@ -102,13 +108,19 @@ class Avance extends Instruccion {
 
     @Override
     public void imprimir(int nivel) {
-        imprimirIndentacion(nivel);
-        System.out.println("AVANCE:");
+        imprimir(nivel, true);
+    }
+
+    @Override
+    public void imprimir(int nivel, boolean indentarPrimeraLinea) {
+        if (indentarPrimeraLinea) {
+            imprimirIndentacion(nivel);
+        }
+        System.out.println("AVANCE");
+        
         if (identificadores != null) {
             for (Identificador id : identificadores) {
-                if (id != null) {
-                    id.imprimir(nivel + 1);
-                }
+                if (id != null) id.imprimir(nivel + 1);
             }
         }
     }
@@ -126,7 +138,7 @@ class Secuenciacion extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("- SECUENCIACION: ");
+        System.out.println("SECUENCIACION");
         if (i1 != null) i1.imprimir(nivel + 1);
         if (i2 != null) i2.imprimir(nivel + 1);
 }
@@ -142,7 +154,7 @@ class Entrada extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("- ENTRADA:");
+        System.out.println("ENTRADA");
         if (id != null) {
             id.imprimir(nivel + 1);
         }
@@ -159,7 +171,7 @@ class Salida extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("- SALIDA");
+        System.out.println("SALIDA");
         
         if (e != null) {
             e.imprimir(nivel + 1);
@@ -179,7 +191,7 @@ class Movimiento extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("- MOVIMIENTO:" + direccion);
+        System.out.println("MOVIMIENTO:" + direccion);
         if (e != null) {
             e.imprimir(nivel + 1);
         }
@@ -196,7 +208,7 @@ class Soltado extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("- SOLTADO:");
+        System.out.println("SOLTADO");
         e.imprimir(nivel + 1);
     }
 }
@@ -211,7 +223,7 @@ class Coleccion extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("- COLECCION:");
+        System.out.println("COLECCION");
         if (id != null) {
             id.imprimir(nivel + 1);
         }
@@ -228,7 +240,7 @@ class Almacenamiento extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("- ALMACENAMIENTO:");
+        System.out.println("ALMACENAMIENTO");
         e.imprimir(nivel + 1);
     }
 }
@@ -244,15 +256,25 @@ class IteracionIndet extends Instruccion {
 
     @Override
     public void imprimir(int nivel) {
-    imprimirIndentacion(nivel);
-    System.out.println("ITERACION INDETERMINADA:");
-    if (e != null) e.imprimir(nivel + 1);
-    if (i != null) i.imprimir(nivel + 1);
+        imprimirIndentacion(nivel);
+        System.out.println("ITERACION INDETERMINADA");
+        
+        if (e != null) {
+            imprimirIndentacion(nivel + 1);
+            System.out.print("- guardia: ");
+            e.imprimir(nivel + 1, false); 
+        }
+        
+        if (i != null) {
+            imprimirIndentacion(nivel + 1);
+            System.out.print("- exito: ");
+            i.imprimir(nivel + 1, false);
+        }
     }
 }
 
 class Condicional extends Instruccion {
-    private Expresion e;
+    private Expresion e;    
     private Instruccion i1;
     private Instruccion i2;
 
@@ -265,9 +287,24 @@ class Condicional extends Instruccion {
     @Override
     public void imprimir(int nivel) {
         imprimirIndentacion(nivel);
-        System.out.println("- CONDICIONAL: ");
-        if (e != null) e.imprimir(nivel + 1);
-        if (i1 != null) i1.imprimir(nivel + 1);
-        if (i2 != null) i2.imprimir(nivel + 1);
+        System.out.println("CONDICIONAL");
+        
+        if (e != null) {
+            imprimirIndentacion(nivel + 1);
+            System.out.print("- guardia: ");
+            e.imprimir(nivel + 1, false); 
+        }
+        
+        if (i1 != null) {
+            imprimirIndentacion(nivel + 1);
+            System.out.print("- exito: ");
+            i1.imprimir(nivel + 1, false);
+        }
+        
+        if (i2 != null) {
+            imprimirIndentacion(nivel + 1);
+            System.out.print("- fracaso: ");
+            i2.imprimir(nivel + 1, false);
+        }
     }
 }

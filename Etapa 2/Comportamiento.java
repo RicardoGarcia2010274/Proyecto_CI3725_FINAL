@@ -1,3 +1,4 @@
+// Implementacion de clase destinada a gestionar los comportamientos en el lenguaje BOT
 public class Comportamiento extends AST {
     private Condicion condicion;
     private Instruccion instruccion;
