@@ -1,0 +1,30 @@
+create
+    int bot contador
+        on activation:
+            store 0.
+        end
+    end
+    bool bot bandera
+        on default:
+            store contador > 5.
+        end
+    end
+execute
+    activate contador, bandera.
+    $- Se crea un ámbito local con un nuevo robot "temp" -$
+    create
+        int bot temp
+            on activation:
+                store 100.
+            end
+        end
+    execute
+        activate temp.
+        while temp > 0:
+            advance temp.
+        end
+    end
+    $- Aquí "temp" ya no es visible, pero contador y bandera sí -$
+    advance contador.
+    advance bandera.
+end

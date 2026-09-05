@@ -1,0 +1,159 @@
+import java.util.ArrayList;
+import java_cup.runtime.Symbol;
+
+class Parser;
+
+// Imprimimos un solo error sintáctico si lo hay
+parser code {:
+
+    @Override
+    public void syntax_error(Symbol cur_token) {
+        int linea = cur_token.left;
+        int columna = cur_token.right;
+        String tokenInesperado = (cur_token.value != null) ? cur_token.value.toString() : "EOF";
+        System.err.println("Error sintáctico en la línea " + linea + ", columna " + columna);
+        System.exit(1);
+    }
+
+    @Override
+    public void unrecovered_syntax_error(Symbol cur_token) throws java.lang.Exception {
+    }
+:};
+
+// Creación de los terminales
+terminal TkCreate, TkExecute, TkEnd, TkInt, TkBot, TkWhile, TkIf, TkElse;
+terminal TkSuma, TkResta, TkMult, TkDiv, TkMod, TkParAbre, TkParCierra;
+terminal TkPunto, TkComa, TkDosPuntos, TkIgual, TkMenor, TkMayor, TkNegacion;
+terminal TkDisyuncion, TkConjuncion, TkAs, TkUp, TkMe, TkOn, TkChar, TkRead;
+terminal TkDesigual, TkMayorIgual, TkMenorIgual, TkDrop, TkDown, TkLeft, TkSend;
+terminal TkBool, TkRight, TkStore, TkCollect, TkDefault;
+terminal TkAdvance, TkActivate, TkDeactivate, TkActivation, TkDeactivation;
+terminal MENOS_UNARIO;
+
+//Terminales con un valor específico asociado
+terminal String  TkIdent, TkCaracter;
+terminal Integer TkNum;
+terminal Boolean TkTrue, TkFalse;
+
+// Creación de los no terminales
+non terminal Expresion expr;
+non terminal Instruccion instcontr;
+non terminal Instruccion instrobot;
+non terminal Instruccion secuenciacontr;
+non terminal Instruccion secuenciarobot;
+non terminal ArrayList<Declaracion> lista_declr;
+non terminal ArrayList<Identificador> lista_ident;
+non terminal ArrayList<Comportamiento> lista_comp;
+non terminal Declaracion declaracion;
+non terminal Identificador ident;
+non terminal Comportamiento comportamiento;
+non terminal Condicion condicion;
+non terminal AST inicial;
+
+// Definimos la precedencia de operadores
+precedence left TkDisyuncion;
+precedence left TkConjuncion;
+precedence nonassoc TkIgual, TkDesigual, TkMayor, TkMenor, TkMayorIgual, TkMenorIgual;
+precedence left TkSuma, TkResta;
+precedence left TkMult, TkDiv, TkMod;
+precedence right TkNegacion;
+precedence right MENOS_UNARIO;
+
+start with inicial;
+
+inicial ::= TkCreate lista_declr:d TkExecute secuenciacontr:s TkEnd {: RESULT = new Programa(d, s); :}
+    | TkExecute secuenciacontr:s TkEnd {: RESULT = new Programa(null, s); :};
+
+lista_declr ::= declaracion:decl lista_declr:rest 
+    {: 
+        if (rest == null) {
+            ArrayList<Declaracion> lista = new ArrayList<Declaracion>();
+            lista.add(decl);
+            RESULT = lista;
+        } else {
+            rest.add(0, decl);
+            RESULT = rest;
+        }
+    :}
+    | {: RESULT = new ArrayList<Declaracion>(); :};
+
+declaracion ::= TkBool TkBot lista_ident:id lista_comp:c TkEnd {: RESULT = new Declaracion("bool", id, c); :}
+    | TkInt TkBot lista_ident:id lista_comp:c TkEnd {: RESULT = new Declaracion("int", id, c); :}
+    | TkChar TkBot lista_ident:id lista_comp:c TkEnd {: RESULT = new Declaracion("char", id, c); :};
+
+ident ::= TkIdent:id {: RESULT = new Identificador(id, idleft, idright); :};
+
+lista_ident ::= lista_ident:li TkComa ident:i {: li.add(i); RESULT = li; :}
+    | ident:i {: ArrayList<Identificador> lista = new ArrayList<Identificador>(); lista.add(i); RESULT = lista; :}
+    | {: RESULT = new ArrayList<Identificador>(); :};
+
+lista_comp ::= lista_comp:lc comportamiento:c {: lc.add(c); RESULT = lc; :}
+    | {: RESULT = new ArrayList<Comportamiento>(); :};
+
+comportamiento ::= TkOn condicion:c TkDosPuntos secuenciarobot:s TkEnd 
+    {: 
+        if (s == null) {
+            RESULT = new Comportamiento(c, null);
+        } else {
+            RESULT = new Comportamiento(c, s);
+        }
+    :};
+
+condicion ::= expr:e {: RESULT = new CondExpresion(e); :}
+    | TkActivation {: RESULT = new CondActivation(); :}
+    | TkDeactivation {: RESULT = new CondDeactivation(); :}
+    | TkDefault {: RESULT = new CondDefault(); :};
+
+secuenciacontr ::= secuenciacontr:s instcontr:i {: RESULT = new Secuenciacion(s, i); :}
+    | instcontr:i {: RESULT = i; :};
+
+instcontr ::= TkActivate:a lista_ident:id TkPunto {: RESULT = new Activacion(id, aleft, aright); :}
+    | TkAdvance:a lista_ident:id TkPunto {: RESULT = new Avance(id, aleft, aright); :}
+    | TkDeactivate:d lista_ident:id TkPunto {: RESULT = new Desactivacion(id, dleft, dright); :}
+    | TkIf:i expr:e TkDosPuntos secuenciacontr:s TkEnd {: RESULT = new Condicional(e, s, null, ileft, iright); :}
+    | TkIf:i expr:e TkDosPuntos secuenciacontr:s1 TkElse TkDosPuntos secuenciacontr:s2 TkEnd {: RESULT = new Condicional(e, s1, s2, ileft, iright); :}
+    | TkWhile:w expr:e TkDosPuntos secuenciacontr:s TkEnd {: RESULT = new IteracionIndet(e, s, wleft, wright); :}
+    | TkCreate:c lista_declr:d TkExecute secuenciacontr:s TkEnd {: RESULT = new IncorpAlcance(d, s, cleft, cright); :}
+    | TkExecute:e secuenciacontr:s TkEnd {: RESULT = new IncorpAlcance(null, s, eleft, eright); :};
+
+secuenciarobot ::= secuenciarobot:s instrobot:i {: RESULT = new Secuenciacion(s, i); :}
+    | instrobot:i {: RESULT = i; :};
+
+instrobot ::= TkStore:s expr:e TkPunto {: RESULT = new Almacenamiento(e, sleft, sright); :}
+    | TkCollect:c TkAs TkIdent:var TkPunto {: RESULT = new Coleccion(new Identificador(var, varleft, varright), cleft, cright); :}
+    | TkCollect:c TkPunto {: RESULT = new Coleccion(null, cleft, cright); :}
+    | TkDrop:d expr:e TkPunto {: RESULT = new Soltado(e, dleft, dright); :}
+    | TkLeft:m expr:e TkPunto {: RESULT = new Movimiento("left", e, mleft, mright); :}
+    | TkRight:m expr:e TkPunto {: RESULT = new Movimiento("right", e, mleft, mright); :}
+    | TkUp:m expr:e TkPunto {: RESULT = new Movimiento("up", e, mleft, mright); :}
+    | TkDown:m TkPunto {: RESULT = new Movimiento("down", null, mleft, mright); :}
+    | TkLeft:m TkPunto {: RESULT = new Movimiento("left", null, mleft, mright); :}
+    | TkRight:m TkPunto {: RESULT = new Movimiento("right", null, mleft, mright); :}
+    | TkUp:m TkPunto {: RESULT = new Movimiento("up", null, mleft, mright); :}
+    | TkDown:m expr:e TkPunto {: RESULT = new Movimiento("down", e, mleft, mright); :}
+    | TkRead:r TkPunto {: RESULT = new Entrada(null, rleft, rright); :}
+    | TkRead:r TkAs TkIdent:id TkPunto {: RESULT = new Entrada(new Identificador(id, idleft, idright), rleft, rright); :}
+    | TkSend:s TkPunto {: RESULT = new Salida(null, sleft, sright); :};
+
+expr ::= expr:e1 TkSuma:op expr:e2 {: RESULT = new ExpBinArit("'Suma'", e1, e2, opleft, opright); :}
+	| expr:e1 TkResta:op expr:e2 {: RESULT = new ExpBinArit("'Resta'", e1, e2, opleft, opright); :}
+	| expr:e1 TkMult:op expr:e2 {: RESULT = new ExpBinArit("'Multiplicacion'", e1, e2, opleft, opright); :}
+	| expr:e1 TkDiv:op expr:e2 {: RESULT = new ExpBinArit("'Division'", e1, e2, opleft, opright); :}
+	| expr:e1 TkMod:op expr:e2 {: RESULT = new ExpBinArit("'Modulo'", e1, e2, opleft, opright); :}
+	| TkParAbre expr:e TkParCierra {: RESULT = e; :}
+	| TkResta:op expr:e {: RESULT = new ExpUnaria("-", e, opleft, opright); :} %prec MENOS_UNARIO
+	| TkNum:n {: RESULT = new LiteralEntero(n, nleft, nright); :}
+	| TkIdent:id {: RESULT = new Identificador(id, idleft, idright); :}
+	| expr:e1 TkConjuncion:op expr:e2 {: RESULT = new ExpBinBool("'Conjuncion'", e1, e2, opleft, opright); :}
+	| expr:e1 TkDisyuncion:op expr:e2 {: RESULT = new ExpBinBool("'Disyuncion'", e1, e2, opleft, opright); :}
+	| TkNegacion:op expr:e1 {: RESULT = new ExpUnaria("'Negacion'", e1, opleft, opright); :}
+	| TkTrue:t {: RESULT = new LiteralBool(true, tleft, tright); :}
+	| TkFalse:f {: RESULT = new LiteralBool(false, fleft, fright); :}
+	| expr:e1 TkDesigual:op expr:e2 {: RESULT = new ExpBinRelacional("'Desigual'", e1, e2, opleft, opright); :}
+	| expr:e1 TkIgual:op expr:e2 {: RESULT = new ExpBinRelacional("'Igual'", e1, e2, opleft, opright); :}
+	| expr:e1 TkMayor:op expr:e2 {: RESULT = new ExpBinRelacional("'Mayor que'", e1, e2, opleft, opright); :}
+	| expr:e1 TkMenor:op expr:e2 {: RESULT = new ExpBinRelacional("'Menor que'", e1, e2, opleft, opright); :}
+	| expr:e1 TkMayorIgual:op expr:e2 {: RESULT = new ExpBinRelacional("'Mayor igual'", e1, e2, opleft, opright); :}
+	| expr:e1 TkMenorIgual:op expr:e2 {: RESULT = new ExpBinRelacional("'Menor igual'", e1, e2, opleft, opright); :}
+	| TkCaracter:c {: RESULT = new LiteralCaracter(c, cleft, cright); :}
+	| TkMe:m {: RESULT = new Identificador("me", mleft, mright); :};

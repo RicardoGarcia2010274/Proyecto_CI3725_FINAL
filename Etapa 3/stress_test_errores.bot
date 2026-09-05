@@ -1,0 +1,43 @@
+create
+    int bot botA
+        on activation:
+            store 10.
+            left 2 + 1.
+        end
+        on default:
+            store 'z'.
+        end
+    end
+    bool bot botB
+        on activation:
+            store true /\ false.
+        end
+    end
+execute
+    activate botA, botB.
+    
+    if botA + true > 0:
+        advance botA.
+    end
+
+    while 'x':
+        if me:
+            advance botA.
+        end
+        advance botC.
+    end
+
+    create
+        char bot botA
+            on activation:
+                store 'w'.
+            end
+        end
+    execute
+        activate botA.
+        if botA = 100:
+            advance botA.
+        end
+        advance botB.
+    end
+end
