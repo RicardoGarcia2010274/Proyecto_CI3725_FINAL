@@ -1,0 +1,13 @@
+create
+    int bot centinela
+        on default:
+            read.
+        end
+    end
+execute
+    activate centinela.
+    advance centinela.
+    
+    $- Error dinamico: activacion ilegal sobre un robot ya activo -$
+    activate centinela.
+end

@@ -1,0 +1,19 @@
+create
+    int bot sembrador
+        on default:
+            drop 99.
+        end
+    end
+    
+    char bot cosechador
+        on default:
+            collect.
+        end
+    end
+execute
+    activate sembrador, cosechador.
+    advance sembrador.
+    $- cosechador (char) intenta levantar un 99 (int) del piso -$
+    advance cosechador.
+    deactivate sembrador, cosechador.
+end

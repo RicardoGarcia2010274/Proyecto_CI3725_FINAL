@@ -50,10 +50,14 @@ public class Main {
 						System.err.println(error);
 					}
 					System.exit(1);
+				} else {
+					// Si el análisis estático es exitoso, se ejecuta el intérprete
+					Interprete motor = new Interprete();
+					motor.interpretar((Programa) arbol);
 				}
 				
-				// Si pasa las verificaciones, imprime el AST
-                arbol.imprimir(0);
+				// Si pasa las verificaciones, imprime el AST (En la etapa 4 se eliminó esto para imprimir lo solicitado nada mas)
+                //arbol.imprimir(0);
             }
             
         } catch (Exception e) {

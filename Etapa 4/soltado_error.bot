@@ -1,0 +1,12 @@
+create
+    bool bot interruptor
+        on default:
+            $- Intentar soltar un entero cuando el robot es bool -$
+            drop 15.
+        end
+    end
+execute
+    activate interruptor.
+    advance interruptor.
+    deactivate interruptor.
+end

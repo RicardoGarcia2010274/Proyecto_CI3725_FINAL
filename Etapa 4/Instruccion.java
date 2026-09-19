@@ -265,6 +265,7 @@ class Movimiento extends Instruccion {
     }
 	
 	public Expresion getExpresion() { return this.e; }
+	public String getDireccion() { return this.direccion; }
 
     @Override
     public void imprimir(int nivel) {

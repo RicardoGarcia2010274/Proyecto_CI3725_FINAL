@@ -1,0 +1,24 @@
+create
+    int bot explorador
+        on default:
+            read.
+            drop me.
+            right 2.
+            left 2.
+            collect as muestra.
+        end
+    end
+    
+    bool bot validador
+        on default:
+            read.
+        end
+    end
+execute
+    activate explorador, validador.
+    
+    advance explorador.
+    advance validador.
+    
+    deactivate explorador, validador.
+end

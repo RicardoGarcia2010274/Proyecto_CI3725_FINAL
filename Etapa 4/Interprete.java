@@ -10,12 +10,16 @@ public class Interprete {
 	// Diccionario temporal para variables locales (Creadas con 'as')
 	private Map<String, Object> variablesLocales;
 	
+	// Matriz infinita del mundo (Llave "x,y", Valor: Object)
+	private Map<String, Object> matrizMundo;
+	
 	private RobotRuntime robotActual = null;
 	
 	// Constructor
 	public Interprete() {
 		this.robotsEnEjecucion = new HashMap<>();
 		this.variablesLocales = new HashMap<>();
+		this.matrizMundo = new HashMap<>();
 	}
 	
 	// Llamado a la función que ejecuta el interpretador
@@ -46,7 +50,7 @@ public class Interprete {
 			correr(sec.getI2());
 		}
 		
-		// Actuvación de robots
+		// Activación de robots
 		else if (inst instanceof Activacion) {
 			Activacion act = (Activacion) inst;
 			for (Identificador id : act.getIdentificadores()) {
@@ -60,6 +64,20 @@ public class Interprete {
 		}
 		
 		// Desactivación de robots
+		else if (inst instanceof Desactivacion) {
+			Desactivacion deact = (Desactivacion) inst;
+			for (Identificador id : deact.getIdentificadores()) {
+				RobotRuntime bot = robotsEnEjecucion.get(id.getName());
+				
+				// Verifica desactivación ilegal
+				if (!bot.activo) {
+					errorDinamico("Desactivación ilegal: el robot '" + bot.nombre + "' ya se encuentra inactivo.");
+				}
+				bot.activo = false;
+			}
+		}
+		
+		// Condicional
 		else if (inst instanceof Condicional) {
 			Condicional cond = (Condicional) inst;
 			boolean guardia = (Boolean) evaluar(cond.getExpresion());
@@ -133,7 +151,7 @@ public class Interprete {
 				
 				for (Comportamiento comp : bot.comportamientos) {
 					// Si el comportamiento es default, lo guardamos por si ningún otro aplica
-					if (comp.getCondicion().toString().contains("default")) {
+					if (comp.getCondicion() instanceof CondDefault) {
 						compDefault = comp;
 					}
 					// Si el comportamiento tiene una condición booleana explícita
@@ -202,17 +220,23 @@ public class Interprete {
 				errorDinamico("Soltado inadecuado: Se intentó soltar en la matriz un valor inconsistente con el robot (" + robotActual.tipo + ").");
 			}
 			
-			// Me falta lo de guardar 'val' en la matriz, ahora voy pa esa
+			// Guarda el valor en la coordenada actual del robot
+			String coordenada = robotActual.x + "," + robotActual.y;
+			matrizMundo.put(coordenada, val);
 		}
 		
 		// Colección (collect)
 		else if (inst instanceof Coleccion) {
 			Coleccion col = (Coleccion) inst;
+			String coordenada = robotActual.x + "," + robotActual.y;
 			
-			// Hay que leer el valor de la celda de la matriz donde esta parado el robot
-			Object valorMatriz = 7; // numero temporal
+			Object valorMatriz = matrizMundo.get(coordenada);
 			
 			// Verificación colección inadecuada
+			if (valorMatriz == null) {
+				errorDinamico("Colección inadecuada: No hay ningún valor en la celda actual (" + coordenada + ").");
+			}
+			
 			if (!validarCompatibilidad(valorMatriz, robotActual.tipo)) {
 				errorDinamico("Colección inadecuada: El valor en la matriz no coincide con el tipo del robot (" + robotActual.tipo + ").");
 			}
@@ -222,15 +246,26 @@ public class Interprete {
 			} else {
 				robotActual.valorAlmacenado = valorMatriz;
 			}
+			
+			// Limpia la celda tras recoger el objeto
+			matrizMundo.remove(coordenada);
 		}
 		
 		// Movimientos (up, down, left, right)
 		else if (inst instanceof Movimiento) {
 			Movimiento mov = (Movimiento) inst;
+			int pasos = 1; // Por defecto es 1 si no hay expresión
+			
 			if (mov.getExpresion() != null) {
-				int pasos = (Integer) evaluar(mov.getExpresion());
-				// Actualizar las coordenadas del robotActual en la matriz
+				pasos = (Integer) evaluar(mov.getExpresion());
 			}
+			
+			String dir = mov.getDireccion();
+			
+			if (dir.equals("up")) robotActual.y += pasos;
+			else if (dir.equals("down")) robotActual.y -= pasos;
+			else if (dir.equals("right")) robotActual.x += pasos;
+			else if (dir.equals("left")) robotActual.x -= pasos;
 		}
 	}
 	
@@ -247,7 +282,12 @@ public class Interprete {
 			String nombre = ((Identificador) exp).getName();
 			if (nombre.equals("me")) {
 				// El analizador estático ya garantizó que esto solo corre dentro de un comportamiento
-				return robotActual.valorAlmacenado;
+				return (robotActual != null) ? robotActual.valorAlmacenado : 0;
+			}
+			// Retorna el estado del robot si se llama desde el controlador
+			if (robotsEnEjecucion.containsKey(nombre)) {
+				Object val = robotsEnEjecucion.get(nombre).valorAlmacenado;
+				return (val != null) ? val : 0;
 			}
 			return variablesLocales.get(nombre);
 		}

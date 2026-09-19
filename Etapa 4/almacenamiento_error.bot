@@ -1,0 +1,21 @@
+create
+    int bot emisor
+        on default:
+            drop 45.
+        end
+    end
+
+    char bot receptor
+        on default:
+            $- Recolecta en una variable local el entero 45 -$
+            collect as temp.
+            $- Intenta almacenar el contenido de temp (int) en receptor (char) -$
+            store temp.
+        end
+    end
+execute
+    activate emisor, receptor.
+    advance emisor.
+    advance receptor.
+    deactivate emisor, receptor.
+end

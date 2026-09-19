@@ -1,0 +1,13 @@
+create
+    int bot torpe
+        on default:
+            store 10.
+        end
+    end
+execute
+    activate torpe.
+    deactivate torpe.
+    
+	$- El robot ya fue desactivado en la línea anterior -$
+   deactivate torpe.
+end

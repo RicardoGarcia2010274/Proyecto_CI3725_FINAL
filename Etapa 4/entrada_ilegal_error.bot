@@ -1,0 +1,12 @@
+create
+    int bot matematico
+        on default:
+			$- Esto dará error si se especifica 0 en la entrada -$
+            read as divisor.
+            store 100 / divisor.
+        end
+    end
+execute
+    activate matematico.
+    advance matematico.
+end
